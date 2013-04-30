@@ -1,5 +1,11 @@
 # Readme of CliffieGame
 
+## Screenshots
+![Screenshot 1](https://raw.github.com/CliffracerX/CliffieGame/master/screenshots/2013-04-30_15.23.34.png)
+![Screenshot 2](https://raw.github.com/CliffracerX/CliffieGame/master/screenshots/2013-04-30_15.24.07.png)
+![Screenshot 3](https://raw.github.com/CliffracerX/CliffieGame/master/screenshots/2013-04-30_15.24.26.png)
+![Screenshot 4](https://raw.github.com/CliffracerX/CliffieGame/master/screenshots/2013-04-30_15.24.43.png)
+
 ## Attributions
 - PNGDecoder for textures
 	- From the TWL project.  http://twl.l33tlabs.org/
