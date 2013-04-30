@@ -1,0 +1,10 @@
+##########
+# Ignore misc. directories in CliffieGame root
+extlib/*.jar
+extlib/natives
+bin/*
+doc/*
+textures-backup/
+textures-sphax/
+##########
+
