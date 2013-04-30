@@ -435,7 +435,8 @@ public class CliffieGame {
 		 */
 		while (!Display.isCloseRequested()) {
 			delta = getDelta();
-			update(delta);
+			processInput(delta);
+			renderGL(delta);
 
 			// Display.update() causes the buffer to be drawn to the screen and
 			// keyboard and mouse IO to be processed.
@@ -448,8 +449,10 @@ public class CliffieGame {
 	}
 
 	/**
-	 * Render OpenGL here. LWJGL uses double buffering and everything will be
-	 * drawn to an offscreen buffer.
+	 * Update position, etc. based on mouse and keyboard input. 
+	 * 
+	 * TODO: Movement needs to use the delta parameter to control speed 
+	 * independent of the FPS. [EJW]
 	 * 
 	 * @param delta
 	 *            The number of milliseconds that have passed since the last
@@ -457,79 +460,10 @@ public class CliffieGame {
 	 *            a frame independent way. Meaning that regardless of how fast
 	 *            or slow the fps is everything should move at a constant speed.
 	 */
-	public void update(int delta) {
-		int ID;
-
+	public void processInput(int delta) {
 		currentTime = this.dateFormat.format(new Date()); // Used for timestamp
 															// on screencaps.
 
-		RenderBlocks.renderNormalBlock((float) 500, (float) 500, (float) 500,
-				true, 1);
-
-		GL11.glRotatef(rotation.x, 1, 0, 0);
-		GL11.glRotatef(rotation.y, 0, 1, 0);
-		GL11.glRotatef(rotation.z, 0, 0, 1);
-
-		GL11.glTranslatef(position.x + this.theWorld.WORLD_SIZE / 2, position.y
-				+ this.theWorld.WORLD_SIZE / 4, position.z
-				+ this.theWorld.WORLD_SIZE / 2);
-		// Vector3f destination = (Vector3f) getPickingRay(
-		// Display.getWidth() / 2, Display.getHeight() / 2);
-		// Ray rayPick = new Ray(new Vector3f(position.x, position.y,
-		// position.z), destination);
-		// GL11.glBegin(GL11.GL_LINES);
-		// GL11.glColor3f(1f, 1f, 1f);
-		// GL11.glVertex3f(rayPick.begin.x, rayPick.begin.y,
-		// rayPick.begin.z);
-		// GL11.glColor3f(.3f, .3f, .3f);
-		// GL11.glVertex3f(rayPick.dest.x, rayPick.dest.y,
-		// rayPick.dest.z);
-		// GL11.glEnd();
-		GL11.glCullFace(GL11.GL_BACK);
-		// GL11.glCullFace(GL11.GL_);
-		for (int cx = 0; cx < this.theWorld.WORLD_SIZE; cx++) {
-			for (int cz = 0; cz < this.theWorld.WORLD_SIZE; cz++) {
-				for (int x = 0; x < Chunk.CHUNK_SIZE; x++) {
-					for (int y = 0; y < Chunk.CHUNK_SIZE; y++) {
-						for (int z = 0; z < Chunk.CHUNK_SIZE; z++) {
-							ID = this.theWorld.getBlock(x, y, z, cx, cz);
-							if (ID != 0) {
-								// if(/*this.theWorld.getBlock(x, y+1,
-								// z, cx, cz)==Block.blockAir ||
-								// */this.theWorld.getBlock(x, y-1, z,
-								// cx, cz)==Block.blockAir)// ||
-								// this.theWorld.getBlock(x+1, y, z, cx,
-								// cz)==Block.blockAir ||
-								// this.theWorld.getBlock(x-1, y, z, cx,
-								// cz)==Block.blockAir ||
-								// this.theWorld.getBlock(x, y, z+1, cx,
-								// cz)==Block.blockAir ||
-								// this.theWorld.getBlock(x, y, z-1, cx,
-								// cz)==Block.blockAir)
-								// {
-								// System.out.println("X: " + position.x
-								// + " Y: " + position.y +
-								// " Z: " + position.z);
-								// System.out.println("Rendering a block at: "+x+" "+y+" "+z+" Of type: "+ID);
-								RenderBlocks.renderNormalBlock(
-										(float) (x + (cx * 16)) * 2,
-										(float) y * 2,
-										(float) (z + (cz * 16)) * 2, false, ID);
-								// }
-								/*
-								 * else { RenderBlocks.renderNormalBlock(
-								 * (float) (x+(cx*16)) * 2, (float) y * 2,
-								 * (float) (z+(cz*16)) * 2, false,
-								 * Block.MELCobble.id); }
-								 */
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// processInput();
 		// GL11.glTranslatef(0, 1, -5); // Move Right
 		if (Mouse.isGrabbed()) {
 			/*
@@ -781,6 +715,85 @@ public class CliffieGame {
 		updateFPS(); // Update the FPS counter
 	}
 
+	/**
+	 * Render OpenGL. LWJGL uses double buffering and everything will be
+	 * drawn to an offscreen buffer.
+	 * 
+	 * @param delta
+	 *            The number of milliseconds that have passed since the last
+	 *            frame. This value can be used to move entities in the game in
+	 *            a frame independent way. Meaning that regardless of how fast
+	 *            or slow the fps is everything should move at a constant speed.
+	 *            EJW: This is currently unused.
+	 */
+	public void renderGL(int delta) {
+		int ID;
+		RenderBlocks.renderNormalBlock((float) 500, (float) 500, (float) 500,
+				true, 1);
+
+		GL11.glRotatef(rotation.x, 1, 0, 0);
+		GL11.glRotatef(rotation.y, 0, 1, 0);
+		GL11.glRotatef(rotation.z, 0, 0, 1);
+
+		GL11.glTranslatef(position.x + this.theWorld.WORLD_SIZE / 2, position.y
+				+ this.theWorld.WORLD_SIZE / 4, position.z
+				+ this.theWorld.WORLD_SIZE / 2);
+		// Vector3f destination = (Vector3f) getPickingRay(
+		// Display.getWidth() / 2, Display.getHeight() / 2);
+		// Ray rayPick = new Ray(new Vector3f(position.x, position.y,
+		// position.z), destination);
+		// GL11.glBegin(GL11.GL_LINES);
+		// GL11.glColor3f(1f, 1f, 1f);
+		// GL11.glVertex3f(rayPick.begin.x, rayPick.begin.y,
+		// rayPick.begin.z);
+		// GL11.glColor3f(.3f, .3f, .3f);
+		// GL11.glVertex3f(rayPick.dest.x, rayPick.dest.y,
+		// rayPick.dest.z);
+		// GL11.glEnd();
+		GL11.glCullFace(GL11.GL_BACK);
+		// GL11.glCullFace(GL11.GL_);
+		for (int cx = 0; cx < this.theWorld.WORLD_SIZE; cx++) {
+			for (int cz = 0; cz < this.theWorld.WORLD_SIZE; cz++) {
+				for (int x = 0; x < Chunk.CHUNK_SIZE; x++) {
+					for (int y = 0; y < Chunk.CHUNK_SIZE; y++) {
+						for (int z = 0; z < Chunk.CHUNK_SIZE; z++) {
+							ID = this.theWorld.getBlock(x, y, z, cx, cz);
+							if (ID != 0) {
+								// if(/*this.theWorld.getBlock(x, y+1,
+								// z, cx, cz)==Block.blockAir ||
+								// */this.theWorld.getBlock(x, y-1, z,
+								// cx, cz)==Block.blockAir)// ||
+								// this.theWorld.getBlock(x+1, y, z, cx,
+								// cz)==Block.blockAir ||
+								// this.theWorld.getBlock(x-1, y, z, cx,
+								// cz)==Block.blockAir ||
+								// this.theWorld.getBlock(x, y, z+1, cx,
+								// cz)==Block.blockAir ||
+								// this.theWorld.getBlock(x, y, z-1, cx,
+								// cz)==Block.blockAir)
+								// {
+								// System.out.println("X: " + position.x
+								// + " Y: " + position.y +
+								// " Z: " + position.z);
+								// System.out.println("Rendering a block at: "+x+" "+y+" "+z+" Of type: "+ID);
+								RenderBlocks.renderNormalBlock(
+										(float) (x + (cx * 16)) * 2,
+										(float) y * 2,
+										(float) (z + (cz * 16)) * 2, false, ID);
+								// }
+								/*
+								 * else { RenderBlocks.renderNormalBlock(
+								 * (float) (x+(cx*16)) * 2, (float) y * 2,
+								 * (float) (z+(cz*16)) * 2, false,
+								 * Block.MELCobble.id); }
+								 */
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	public Random getRandom() {
 		return random;
 	}
