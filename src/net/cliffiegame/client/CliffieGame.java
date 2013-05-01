@@ -15,6 +15,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
 import net.cliffiegame.common.Chunk;
@@ -50,7 +52,6 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.glu.GLU;
 //import org.lwjgl.util.vector.Vector;
 import org.lwjgl.util.vector.Vector3f;
-
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
@@ -80,7 +81,6 @@ public class CliffieGame {
 		long time = getTime();
 		int delta = (int) (time - lastFrame);
 		lastFrame = time;
-
 		return delta;
 	}
 
@@ -150,16 +150,9 @@ public class CliffieGame {
 		cg.start(args);
 	}
 
-	public void start(String[] stuff) {
+	public void start(String[] args) {
 		try {
-			if (stuff.length > 0) {
-				if (stuff[0] == "false")
-					this.doOptionsOnStart = true;
-				this.theWorld.WORLD_SIZE = Integer.parseInt(stuff[1]);
-				this.theWorld.seed = Integer.parseInt(stuff[2]);
-			}
-			if (this.doOptionsOnStart)
-				testInput();
+			loadConfig();
 			createWindow();
 			System.out.println("OpenGL version: "
 					+ GL11.glGetString(GL11.GL_VERSION));
@@ -172,58 +165,30 @@ public class CliffieGame {
 		}
 	}
 
-	private void testInput() {
-		Scanner input = new Scanner(System.in);
-		System.out
-				.println("Please input the world seed.  You may share neat seeds with friends, by giving them the number.  Leave as 0 to do randomly generated.:");
-		int var;
+	private void loadConfig() {
+		int tmpint;
+
+		Properties config = new Properties();
+
 		try {
-			var = input.nextInt();
-		} catch (InputMismatchException e) {
-			System.out
-					.println("Invalid input! Only whole numbers and no letters are accepted.");
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
-			testInput();
-			input.close();
-			return;
+			// load a properties file
+			config.load(new FileInputStream("config.properties"));
+			this.theWorld.setSeed(Integer.parseInt(config
+					.getProperty("worldseed")));
+			this.theWorld.WORLD_SIZE = Integer.parseInt(config
+					.getProperty("worldsize"));
+			tmpint = Integer.parseInt(config.getProperty("worldtype"));
+			if (tmpint == 3)
+				this.theWorld.isWinter = true;
+			if (tmpint == 2)
+				this.theWorld.isCaelum = true;
+			if (tmpint == 1)
+				this.theWorld.setMelonDim(true);
+			if (tmpint == 0)
+				this.theWorld.setMelonDim(false);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		if (var != 0)
-			this.theWorld.setSeed(var);
-		System.out
-				.println("Please input the world size.  It will define how large of a square of chunks you get.  Keep in mind, larger worlds are laggier.  Leave as 0 for the default world size.:");
-		try {
-			var = input.nextInt();
-		} catch (InputMismatchException e) {
-			System.out
-					.println("Invalid input! Only whole numbers and no letters are accepted.");
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
-			testInput();
-			input.close();
-			return;
-		}
-		if (var != 0)
-			this.theWorld.WORLD_SIZE = var;
-		System.out
-				.println("Please input world type.  0=normal, 1=melonland, 2=caelum, 3=snowland:");
-		try {
-			var = input.nextInt();
-		} catch (InputMismatchException e) {
-			System.out
-					.println("Invalid input! Only whole numbers and no letters are accepted.");
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
-			testInput();
-			input.close();
-			return;
-		}
-		if (var == 3)
-			this.theWorld.isWinter = true;
-		if (var == 2)
-			this.theWorld.isCaelum = true;
-		if (var == 1)
-			this.theWorld.setMelonDim(true);
-		if (var == 0)
-			this.theWorld.setMelonDim(false);
-		input.close();
 	}
 
 	public World getWorld() {
