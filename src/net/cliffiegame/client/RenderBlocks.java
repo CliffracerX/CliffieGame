@@ -22,7 +22,7 @@ public class RenderBlocks {
 	 * Actually renders a normal block.
 	 */
 	public static void renderNormalBlock(float x, float y, float z,
-			boolean clear, int id) {
+			boolean clear, int id, int rendermode) {
 		// GL11.glTranslatef(x, y, z);
 		if (clear) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -47,7 +47,8 @@ public class RenderBlocks {
 
 		// GL11.glNewList(displayListSolid, GL11.GL_COMPILE);
 
-		GL11.glBegin(GL11.GL_QUADS);
+		//GL11.glBegin(GL11.GL_QUADS);
+		GL11.glBegin(rendermode);
 		GL11.glColor3f(1.0f, 1.0f, 1.0f);
 		GL11.glNormal3f(0, 1, 0);
 		GL11.glTexCoord2d(0.0f, 0.0f);

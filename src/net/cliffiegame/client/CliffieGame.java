@@ -8,17 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.Sys;
+//import org.lwjgl.Sys;
 
 import java.nio.ByteOrder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Scanner;
 import net.cliffiegame.common.Chunk;
 
 import javax.imageio.ImageIO;
@@ -61,50 +58,9 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format;
  * @author Cliffie
  */
 public class CliffieGame {
-	/**
-	 * Properties used in timing / the game loop.
-	 */
-	long lastFrame;
-	/** time at last frame */
-	int fps;
-	/** frames per second */
-	long lastFPS;
-
-	/** last fps time */
-
-	/**
-	 * Calculate how many milliseconds have passed since last frame.
-	 * 
-	 * @return milliseconds passed since last frame
-	 */
-	public int getDelta() {
-		long time = getTime();
-		int delta = (int) (time - lastFrame);
-		lastFrame = time;
-		return delta;
-	}
-
-	/**
-	 * Get the accurate system time
-	 * 
-	 * @return The system time in milliseconds
-	 */
-	public long getTime() {
-		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-	}
-
-	/**
-	 * Calculate the FPS and set it in the title bar
-	 */
-	public void updateFPS() {
-		if (getTime() - lastFPS > 1000) {
-			Display.setTitle("FPS: " + fps);
-			fps = 0;
-			lastFPS += 1000;
-		}
-		fps++;
-	}
-
+	/** A profiler for calculating FPS, generating a delta, etc. */
+	private Profiler profiler = new Profiler();
+	
 	/** The position of the player as a 3D vector (xyz). */
 	private static Vector3f position = new Vector3f(-6, -43, -30);
 
@@ -127,6 +83,9 @@ public class CliffieGame {
 	/** Defines the minimum angle at which the player can look down. */
 	private static final int maxLookDown = -85;
 	private int mouseSpeed = 1;
+	private int rendermode = GL11.GL_QUADS; // GL_QUADS, GL_LINE_LOOP, etc.
+	private int displaywidth = 768;
+	private int displayheight = 512;
 	private float walkingSpeed = 0.03125F * 8;
 	World theWorld = new World();
 	// private RenderBlocks renderBlock = new RenderBlocks(this.theWorld);
@@ -157,8 +116,6 @@ public class CliffieGame {
 			System.out.println("OpenGL version: "
 					+ GL11.glGetString(GL11.GL_VERSION));
 			initGL();
-			getDelta(); // Initialize timing.
-			lastFPS = getTime(); // Initialize the FPS timer.
 			run();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -177,6 +134,26 @@ public class CliffieGame {
 					.getProperty("worldseed")));
 			this.theWorld.WORLD_SIZE = Integer.parseInt(config
 					.getProperty("worldsize"));
+
+			tmpint = Integer.parseInt(config.getProperty("displaywidth"));
+			if (tmpint > 0 && tmpint < 10000) displaywidth = tmpint;
+
+			tmpint = Integer.parseInt(config.getProperty("displayheight"));
+			if (tmpint > 0 && tmpint < 10000) displayheight = tmpint;
+			
+			tmpint = Integer.parseInt(config.getProperty("rendermode"));
+			if (tmpint == GL11.GL_POINTS || 
+				tmpint == GL11.GL_LINES ||
+				tmpint == GL11.GL_LINE_STRIP ||
+				tmpint == GL11.GL_LINE_LOOP ||
+				tmpint == GL11.GL_TRIANGLES ||
+				tmpint == GL11.GL_TRIANGLE_STRIP ||
+				tmpint == GL11.GL_TRIANGLE_FAN ||
+				tmpint == GL11.GL_QUADS ||
+				tmpint == GL11.GL_QUAD_STRIP ||
+				tmpint == GL11.GL_POLYGON) {
+				rendermode = tmpint;
+			}
 			tmpint = Integer.parseInt(config.getProperty("worldtype"));
 			if (tmpint == 3)
 				this.theWorld.isWinter = true;
@@ -204,7 +181,7 @@ public class CliffieGame {
 		 * == 480 && d[i].getBitsPerPixel() == 32) { displayMode = d[i]; break;
 		 * } }
 		 */
-		Display.setDisplayMode(new DisplayMode(768, 512));
+		Display.setDisplayMode(new DisplayMode(displaywidth, displayheight));
 		Display.setTitle("CliffieGame");
 		Display.create();
 		if (this.skyColor == 0) {
@@ -225,14 +202,9 @@ public class CliffieGame {
 		skyr = (float) (skyColor >> 16 & 255) / 255.0F;
 		skyg = (float) (skyColor >> 8 & 255) / 255.0F;
 		skyb = (float) (skyColor & 255) / 255.0F;
-		System.out.println("Rs: " + fogr + " " + skyr);
-		System.out.println("Gs: " + fogg + " " + skyg);
-		System.out.println("Bs: " + fogb + " " + skyb);
-		// This stuff doesn't actually work. :(
-		// String
-		// libpath=getClass().getClassLoader().getResource(".").getPath()+"natives";
-		// System.setProperty("org.lwjgl.librarypath", libpath);
-		// System.out.println(libpath);
+		//System.out.println("Rs: " + fogr + " " + skyr);
+		//System.out.println("Gs: " + fogg + " " + skyg);
+		//System.out.println("Bs: " + fogb + " " + skyb);
 	}
 
 	private int[] texIds = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -392,14 +364,9 @@ public class CliffieGame {
 	public void run() {
 		int delta;
 		Block thisBlock;
-		/*
-		 * Vector3f lastRot = new Vector3f(0,0,0); Vector3f lastPos = new
-		 * Vector3f(0,0,0); lastRot.x = rotation.x; lastRot.y = rotation.y;
-		 * lastRot.z = rotation.z; lastPos.x = position.x; lastPos.y =
-		 * position.y; lastPos.z = position.z;
-		 */
+
 		while (!Display.isCloseRequested()) {
-			delta = getDelta();
+			delta = profiler.getDelta();
 			processInput(delta);
 			renderGL(delta);
 
@@ -409,7 +376,6 @@ public class CliffieGame {
 			Display.sync(60); // cap fps at 60fps
 
 		}
-		// GL11.glDisable(GL11.GL_TEXTURE_2D);
 		Display.destroy();
 	}
 
@@ -677,7 +643,7 @@ public class CliffieGame {
 				walkingSpeed -= 1;
 			}
 		}
-		updateFPS(); // Update the FPS counter
+		profiler.updateFPS(true); // Update the FPS counter
 	}
 
 	/**
@@ -693,8 +659,8 @@ public class CliffieGame {
 	 */
 	public void renderGL(int delta) {
 		int ID;
-		RenderBlocks.renderNormalBlock((float) 500, (float) 500, (float) 500,
-				true, 1);
+		int tmprendermode=rendermode;
+		RenderBlocks.renderNormalBlock((float) 500, (float) 500, (float) 500, true, 1, rendermode);
 
 		GL11.glRotatef(rotation.x, 1, 0, 0);
 		GL11.glRotatef(rotation.y, 0, 1, 0);
@@ -744,7 +710,8 @@ public class CliffieGame {
 								RenderBlocks.renderNormalBlock(
 										(float) (x + (cx * 16)) * 2,
 										(float) y * 2,
-										(float) (z + (cz * 16)) * 2, false, ID);
+										(float) (z + (cz * 16)) * 2, false, ID, 
+										tmprendermode);
 								// }
 								/*
 								 * else { RenderBlocks.renderNormalBlock(
