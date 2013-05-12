@@ -3,6 +3,13 @@ package net.cliffiegame.client;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 
+/**
+ * Simple class for profiling and controlling game timing.
+ * Originally based on this tutorial:
+ * http://ninjacave.com/lwjglbasics4 
+ * @author ericw
+ *
+ */
 public class Profiler {
 	/**
 	 * Properties used in timing / the game loop.
@@ -55,5 +62,4 @@ public class Profiler {
 		}
 		fps++;
 	}
-
 }

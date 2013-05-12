@@ -65,10 +65,6 @@ public class CliffieGame {
 	private static Vector3f position = new Vector3f(-6, -43, -30);
 
 	/**
-	 * Random instance.
-	 */
-	private Random random = new Random();
-	/**
 	 * The rotation of the axis (where to the player looks). The X component
 	 * stands for the rotation along the x-axis, where 0 is dead ahead, 180 is
 	 * backwards, and 360 is automically set to 0 (dead ahead). The value must
@@ -78,17 +74,16 @@ public class CliffieGame {
 	 * 90.
 	 */
 	private static Vector3f rotation = new Vector3f(30, -40, 0);
-	/** Defines the maximum angle at which the player can look up. */
-	private static final int maxLookUp = 85;
-	/** Defines the minimum angle at which the player can look down. */
-	private static final int maxLookDown = -85;
+	private static final int maxLookUp = 85; // maximum angle at which the player can look up. */
+	private static final int maxLookDown = -85; // minimum angle at which the player can look down.
 	private int mouseSpeed = 1;
-	private int rendermode = GL11.GL_QUADS; // GL_QUADS, GL_LINE_LOOP, etc.
-	private int displaywidth = 768;
-	private int displayheight = 512;
 	private float walkingSpeed = 0.03125F * 8;
+
+	private int rendermode = GL11.GL_QUADS; // Can be overridden by config.properties
+	private int displaywidth = 768; // Can be overridden by config.properties
+	private int displayheight = 512; // Can be overridden by config.properties
+	
 	World theWorld = new World();
-	// private RenderBlocks renderBlock = new RenderBlocks(this.theWorld);
 	DisplayMode displayMode;
 	/**
 	 * Do the options thing when starting client.
@@ -126,7 +121,6 @@ public class CliffieGame {
 		int tmpint;
 
 		Properties config = new Properties();
-
 		try {
 			// load a properties file
 			config.load(new FileInputStream("config.properties"));
@@ -725,13 +719,6 @@ public class CliffieGame {
 				}
 			}
 		}
-	}
-	public Random getRandom() {
-		return random;
-	}
-
-	public void setRandom(Random random) {
-		this.random = random;
 	}
 
 	/*
