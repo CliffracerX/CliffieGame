@@ -23,7 +23,7 @@ public class World {
 	/**
 	 * Seed of the world.  
 	 */
-	public int seed;
+	public int seed = random.nextInt();
     /**
      * Boolean for if the blocks should be melondimension blocks, and later for generating a floating-y melondimension.
      */
