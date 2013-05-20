@@ -201,43 +201,44 @@ public class CliffieGame {
 		//System.out.println("Bs: " + fogb + " " + skyb);
 	}
 
-	private int[] texIds = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0 };
+	private int[] texIds = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	String binpath = getClass().getClassLoader().getResource(".").getPath();
 
 	void setupTextures() {
 		// System.out.println(binpath);
-		texIds[0] = this.loadPNGTexture(binpath + "/textures/cobble.png",
+
+		//texIds[Block.AIR]; // Nothing to be done here.
+		texIds[Block.COBBLE] = this.loadPNGTexture(binpath + "/textures/cobble.png",
 				GL13.GL_TEXTURE0);
-		texIds[1] = this.loadPNGTexture(binpath + "/textures/topgrass.png",
+		texIds[Block.GRASS] = this.loadPNGTexture(binpath + "/textures/topgrass.png",
 				GL13.GL_TEXTURE0);
-		texIds[2] = this.loadPNGTexture(binpath + "/textures/dirt.png",
+		texIds[Block.DIRT] = this.loadPNGTexture(binpath + "/textures/dirt.png",
 				GL13.GL_TEXTURE0);
-		texIds[3] = this.loadPNGTexture(binpath + "/textures/stone.png",
+		texIds[Block.STONE] = this.loadPNGTexture(binpath + "/textures/stone.png",
 				GL13.GL_TEXTURE0);
-		texIds[4] = this.loadPNGTexture(binpath + "/textures/MC.png",
+		texIds[Block.MELCOBBLE] = this.loadPNGTexture(binpath + "/textures/MC.png",
 				GL13.GL_TEXTURE0);
-		texIds[5] = this.loadPNGTexture(binpath + "/textures/MGtop.png",
+		texIds[Block.MELGRASS] = this.loadPNGTexture(binpath + "/textures/MGtop.png",
 				GL13.GL_TEXTURE0);
-		texIds[6] = this.loadPNGTexture(binpath + "/textures/MD.png",
+		texIds[Block.MELDIRT] = this.loadPNGTexture(binpath + "/textures/MD.png",
 				GL13.GL_TEXTURE0);
-		texIds[7] = this.loadPNGTexture(binpath + "/textures/MS.png",
+		texIds[Block.MELSTONE] = this.loadPNGTexture(binpath + "/textures/MS.png",
 				GL13.GL_TEXTURE0);
-		texIds[8] = this.loadPNGTexture(binpath + "/textures/whitecobble.png",
+		texIds[Block.WHITECOBBLE] = this.loadPNGTexture(binpath + "/textures/whitecobble.png",
 				GL13.GL_TEXTURE0);
-		texIds[9] = this.loadPNGTexture(binpath + "/textures/skygrass_top.png",
+		texIds[Block.SKYGRASS] = this.loadPNGTexture(binpath + "/textures/skygrass_top.png",
 				GL13.GL_TEXTURE0);
-		texIds[10] = this.loadPNGTexture(binpath + "/textures/bluedirt.png",
+		texIds[Block.BLUEDIRT] = this.loadPNGTexture(binpath + "/textures/bluedirt.png",
 				GL13.GL_TEXTURE0);
-		texIds[11] = this.loadPNGTexture(binpath + "/textures/whitestone.png",
+		texIds[Block.WHITESTONE] = this.loadPNGTexture(binpath + "/textures/whitestone.png",
 				GL13.GL_TEXTURE0);
-		texIds[12] = this.loadPNGTexture(binpath + "/textures/icebrick.png",
+		texIds[Block.ICEBRICK] = this.loadPNGTexture(binpath + "/textures/icebrick.png",
 				GL13.GL_TEXTURE0);
-		texIds[13] = this.loadPNGTexture(binpath
+		texIds[Block.SNOWGRASS] = this.loadPNGTexture(binpath
 				+ "/textures/snowy_topgrass.png", GL13.GL_TEXTURE0);
-		texIds[14] = this.loadPNGTexture(binpath + "/textures/colddirt.png",
+		texIds[Block.COLDDIRT] = this.loadPNGTexture(binpath + "/textures/colddirt.png",
 				GL13.GL_TEXTURE0);
-		texIds[15] = this.loadPNGTexture(binpath + "/textures/icestone.png",
+		texIds[Block.ICESTONE] = this.loadPNGTexture(binpath + "/textures/icestone.png",
 				GL13.GL_TEXTURE0);
 	}
 
