@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import net.cliffiegame.common.Chunk;
+import net.cliffiegame.common.EntityPlayer;
 
 import javax.imageio.ImageIO;
 //import java.nio.FloatBuffer;
@@ -78,12 +79,12 @@ public class CliffieGame {
 	private static final int maxLookDown = -85; // minimum angle at which the player can look down.
 	private int mouseSpeed = 1;
 	private float walkingSpeed = 0.03125F * 8;
-
 	private int rendermode = GL11.GL_QUADS; // Can be overridden by config.properties
 	private int displaywidth = 768; // Can be overridden by config.properties
 	private int displayheight = 512; // Can be overridden by config.properties
 	
 	World theWorld = new World();
+	private EntityPlayer thePlayer = new EntityPlayer(theWorld);
 	DisplayMode displayMode;
 	/**
 	 * Do the options thing when starting client.
@@ -148,15 +149,6 @@ public class CliffieGame {
 				tmpint == GL11.GL_POLYGON) {
 				rendermode = tmpint;
 			}
-			tmpint = Integer.parseInt(config.getProperty("worldtype"));
-			if (tmpint == 3)
-				this.theWorld.isWinter = true;
-			if (tmpint == 2)
-				this.theWorld.isCaelum = true;
-			if (tmpint == 1)
-				this.theWorld.setMelonDim(true);
-			if (tmpint == 0)
-				this.theWorld.setMelonDim(false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -215,30 +207,6 @@ public class CliffieGame {
 		texIds[Block.DIRT] = this.loadPNGTexture(binpath + "/textures/dirt.png",
 				GL13.GL_TEXTURE0);
 		texIds[Block.STONE] = this.loadPNGTexture(binpath + "/textures/stone.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.MELCOBBLE] = this.loadPNGTexture(binpath + "/textures/MC.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.MELGRASS] = this.loadPNGTexture(binpath + "/textures/MGtop.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.MELDIRT] = this.loadPNGTexture(binpath + "/textures/MD.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.MELSTONE] = this.loadPNGTexture(binpath + "/textures/MS.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.WHITECOBBLE] = this.loadPNGTexture(binpath + "/textures/whitecobble.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.SKYGRASS] = this.loadPNGTexture(binpath + "/textures/skygrass_top.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.BLUEDIRT] = this.loadPNGTexture(binpath + "/textures/bluedirt.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.WHITESTONE] = this.loadPNGTexture(binpath + "/textures/whitestone.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.ICEBRICK] = this.loadPNGTexture(binpath + "/textures/icebrick.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.SNOWGRASS] = this.loadPNGTexture(binpath
-				+ "/textures/snowy_topgrass.png", GL13.GL_TEXTURE0);
-		texIds[Block.COLDDIRT] = this.loadPNGTexture(binpath + "/textures/colddirt.png",
-				GL13.GL_TEXTURE0);
-		texIds[Block.ICESTONE] = this.loadPNGTexture(binpath + "/textures/icestone.png",
 				GL13.GL_TEXTURE0);
 	}
 
@@ -356,9 +324,13 @@ public class CliffieGame {
 	private final DateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd_HH.mm.ss");
 
+	/**
+	 * Version of CliffieGame at the moment.
+	 */
+	private String version = "0.02a";
+
 	public void run() {
 		int delta;
-		Block thisBlock;
 
 		while (!Display.isCloseRequested()) {
 			delta = profiler.getDelta();
@@ -424,8 +396,8 @@ public class CliffieGame {
 			// Vector3f destination =
 			// (Vector3f)getPickingRay(Display.getWidth() / 2,
 			// Display.getHeight() / 2);
-			// Ray rayPick = new Ray(new Vector3f(position.x,
-			// position.y, position.z), destination);
+			// Ray rayPick = new Ray(new Vector3f(thePlayer.x,
+			// thePlayer.y, thePlayer.z), destination);
 			// if(rotation.x >= 270 && rotation.x <= 360)
 			// rayPick.begin.x -= 8; //This is what about I'm
 			// talking.
@@ -494,107 +466,97 @@ public class CliffieGame {
 
 		if (keyUp && keyRight && !keyLeft && !keyDown) {
 			float angle = rotation.y + 45;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyUp && keyLeft && !keyRight && !keyDown) {
 			float angle = rotation.y - 45;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyUp && !keyLeft && !keyRight && !keyDown) {
 			float angle = rotation.y;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyDown && keyLeft && !keyRight && !keyUp) {
 			float angle = rotation.y - 135;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyDown && keyRight && !keyLeft && !keyUp) {
 			float angle = rotation.y + 135;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyDown && !keyUp && !keyLeft && !keyRight) {
 			float angle = rotation.y;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = -(walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyLeft && !keyRight && !keyUp && !keyDown) {
 			float angle = rotation.y - 90;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
+
+
 		}
 		if (keyRight && !keyLeft && !keyUp && !keyDown) {
 			float angle = rotation.y + 90;
-			Vector3f newPosition = new Vector3f(position);
 			float hypotenuse = (walkingSpeed);
 			float adjacent = hypotenuse
 					* (float) Math.cos(Math.toRadians(angle));
 			float opposite = (float) (Math.sin(Math.toRadians(angle)) * hypotenuse);
-			newPosition.z += adjacent;
-			newPosition.x -= opposite;
-			position.z = newPosition.z;
-			position.x = newPosition.x;
+			thePlayer.z += adjacent;
+			thePlayer.x -= opposite;
 		}
 		if (flyUp && !flyDown) {
 			double newPositionY = (walkingSpeed);
-			position.y -= newPositionY;
+			thePlayer.y -= newPositionY;
 		}
 		if (flyDown && !flyUp) {
 			double newPositionY = (walkingSpeed);
-			position.y += newPositionY;
+			thePlayer.y += newPositionY;
 		}
 		if (moveFaster && !moveSlower) {
 			walkingSpeed /= 4f;
@@ -638,7 +600,7 @@ public class CliffieGame {
 				walkingSpeed -= 1;
 			}
 		}
-		profiler.updateFPS(true); // Update the FPS counter
+		profiler.updateFPS(true, "CliffieGame "+this.version); // Update the FPS counter
 	}
 
 	/**
@@ -661,13 +623,13 @@ public class CliffieGame {
 		GL11.glRotatef(rotation.y, 0, 1, 0);
 		GL11.glRotatef(rotation.z, 0, 0, 1);
 
-		GL11.glTranslatef(position.x + this.theWorld.WORLD_SIZE / 2, position.y
-				+ this.theWorld.WORLD_SIZE / 4, position.z
+		GL11.glTranslatef(thePlayer.x + this.theWorld.WORLD_SIZE / 2, thePlayer.y
+				+ this.theWorld.WORLD_SIZE / 4, thePlayer.z
 				+ this.theWorld.WORLD_SIZE / 2);
 		// Vector3f destination = (Vector3f) getPickingRay(
 		// Display.getWidth() / 2, Display.getHeight() / 2);
-		// Ray rayPick = new Ray(new Vector3f(position.x, position.y,
-		// position.z), destination);
+		// Ray rayPick = new Ray(new Vector3f(thePlayer.x, thePlayer.y,
+		// thePlayer.z), destination);
 		// GL11.glBegin(GL11.GL_LINES);
 		// GL11.glColor3f(1f, 1f, 1f);
 		// GL11.glVertex3f(rayPick.begin.x, rayPick.begin.y,
@@ -698,9 +660,9 @@ public class CliffieGame {
 								// this.theWorld.getBlock(x, y, z-1, cx,
 								// cz)==Block.blockAir)
 								// {
-								// System.out.println("X: " + position.x
-								// + " Y: " + position.y +
-								// " Z: " + position.z);
+								// System.out.println("X: " + thePlayer.x
+								// + " Y: " + thePlayer.y +
+								// " Z: " + thePlayer.z);
 								// System.out.println("Rendering a block at: "+x+" "+y+" "+z+" Of type: "+ID);
 								RenderBlocks.renderNormalBlock(
 										(float) (x + (cx * 16)) * 2,

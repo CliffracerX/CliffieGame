@@ -24,12 +24,6 @@ public class World {
 	 * Seed of the world.  
 	 */
 	public int seed = random.nextInt();
-    /**
-     * Boolean for if the blocks should be melondimension blocks, and later for generating a floating-y melondimension.
-     */
-    private boolean isMelonDim;
-	public boolean isCaelum;
-	public boolean isWinter;
 
 	/**
 	 * Currently blank method for updating the world
@@ -54,9 +48,6 @@ public class World {
 				chunks[x][y].x=x;
 				chunks[x][y].y=y;
 				chunks[x][y].seed=seed;
-				chunks[x][y].isMelonDim=this.isMelonDim;
-				chunks[x][y].isCaelum=this.isCaelum;
-				chunks[x][y].isSnow=this.isWinter;
 				//chunks[x][y].octave0=this.octave0;
 				//chunks[x][y].octave1=this.octave1;
 				//chunks[x][y].octave2=this.octave2;
@@ -246,21 +237,5 @@ public class World {
 	 */
 	public void setSeed(int seed) {
 		this.seed = seed;
-	}
-
-	/**
-	 * Gets if the world is melonland.
-	 * @return if the world is melonlands.
-	 */
-	public boolean isMelonDim() {
-		return isMelonDim;
-	}
-
-	/**
-	 * Set the world's isMelonDim to the param isMelonDim.
-	 * @param isMelonDim
-	 */
-	public void setMelonDim(boolean isMelonDim) {
-		this.isMelonDim = isMelonDim;
 	}
 }

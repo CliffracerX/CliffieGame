@@ -52,10 +52,10 @@ public class Profiler {
 	 * 
 	 * @param display If true, the window title will be set to the FPS.
 	 */
-	public void updateFPS(Boolean display) {
+	public void updateFPS(Boolean display, String name) {
 		if (getTime() - lastFPS > 1000) {
 			if (display) {
-				Display.setTitle("FPS: " + fps);
+				Display.setTitle(name+" FPS: " + fps);
 			}
 			fps = 0;
 			lastFPS += 1000;
